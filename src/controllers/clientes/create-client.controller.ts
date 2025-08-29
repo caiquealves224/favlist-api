@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 export class CreateClientController {
     async handler(request: Request, response: Response): Promise<Response> {
         try {
-            const { name, email, phone } = request.body;
+            const { name, email } = request.body;
 
             // Validações básicas
             if (!name || !email) {
@@ -22,7 +22,6 @@ export class CreateClientController {
                 id: 'temp-id',
                 name,
                 email,
-                phone,
                 createdAt: new Date(),
             };
 
