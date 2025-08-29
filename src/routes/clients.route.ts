@@ -1,21 +1,32 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { CreateClientController } from '../controllers/clientes';
+import { UpdateClientController } from '../controllers/clientes';
+import { DeleteClientController } from '../controllers/clientes';
+import { GetClientsController } from '../controllers/clientes';
 
 const router = Router();
 
-router.get('/clients', (req, res) => {
-    res.send('Clients');
+// Instanciar controllers
+const createClientController = new CreateClientController();
+const updateClientController = new UpdateClientController();
+const deleteClientController = new DeleteClientController();
+const getClientsController = new GetClientsController();
+
+// Rotas com tipagem explícita
+router.get('/clients', (req: Request, res: Response) => {
+    return getClientsController.handler(req, res);
 });
 
-router.post('/clients', (req, res) => {
-    res.send('Add Client');
+router.post('/clients', (req: Request, res: Response) => {
+    return createClientController.handler(req, res);
 });
 
-router.patch('/clients/:id', (req, res) => {
-    res.send(`Update Client with ID ${req.params.id}`);
+router.patch('/clients/:id', (req: Request, res: Response) => {
+    return updateClientController.handler(req, res);
 });
 
-router.delete('/clients/:id', (req, res) => {
-    res.send(`Delete Client with ID ${req.params.id}`);
+router.delete('/clients/:id', (req: Request, res: Response) => {
+    return deleteClientController.handler(req, res);
 });
 
 export default router;
