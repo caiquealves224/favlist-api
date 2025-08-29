@@ -6,6 +6,10 @@ import favoritesRoutes from './favorites.route';
 const apiRouter = Router();
 
 // Montar todas as rotas no router principal
+apiRouter.get('/health-check', (req, res) => {
+    res.status(200).send('OK');
+});
+
 apiRouter.use('/clients', clientsRoutes);
 apiRouter.use('/favorites', favoritesRoutes);
 

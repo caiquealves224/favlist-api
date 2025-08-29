@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
+import { updateClientSchema } from '../../schemas/client.schema.js';
 
 export class UpdateClientController {
     async handler(request: Request, response: Response): Promise<Response> {
         try {
             const { id } = request.params;
-            const { name, email, phone } = request.body;
 
-            // Validações básicas
+            // Validação do ID
             if (!id) {
                 return response.status(400).json({
                     success: false,
@@ -14,7 +15,11 @@ export class UpdateClientController {
                 });
             }
 
-            if (!name && !email && !phone) {
+            // Validação com Zod para o body
+            const validatedData = updateClientSchema.parse(request.body);
+
+            // Verificar se pelo menos um campo foi fornecido
+            if (Object.keys(validatedData).length === 0) {
                 return response.status(400).json({
                     success: false,
                     message:
@@ -30,8 +35,9 @@ export class UpdateClientController {
 
             const updatedClient = {
                 id,
-                name: name || 'nome-anterior',
-                email: email || 'email-anterior',
+                name: validatedData.name ?? 'nome-anterior',
+                email: validatedData.email ?? 'email-anterior',
+                updatedAt: new Date(),
             };
 
             return response.status(200).json({
@@ -40,6 +46,11 @@ export class UpdateClientController {
                 data: updatedClient,
             });
         } catch (error) {
+            // Tratamento específico para erros de validação do Zod
+            if (error instanceof ZodError) {
+                return response.status(400).json({ error });
+            }
+
             console.error('Erro ao atualizar cliente:', error);
             return response.status(500).json({
                 success: false,

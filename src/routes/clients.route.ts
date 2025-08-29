@@ -6,19 +6,19 @@ import { GetClientsController } from '../controllers/clientes';
 
 const router = Router();
 
-router.get('/clients', (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
     return new GetClientsController().handler(req, res);
 });
 
-router.post('/clients', (req: Request, res: Response) => {
-    return new CreateClientController().handler(req, res);
+router.post('/', (req: Request, res: Response) => {
+    return new CreateClientController({}).handler(req, res);
 });
 
-router.patch('/clients/:id', (req: Request, res: Response) => {
+router.patch('/:id', (req: Request, res: Response) => {
     return new UpdateClientController().handler(req, res);
 });
 
-router.delete('/clients/:id', (req: Request, res: Response) => {
+router.delete('/:id', (req: Request, res: Response) => {
     return new DeleteClientController().handler(req, res);
 });
 

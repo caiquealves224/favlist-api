@@ -1,36 +1,26 @@
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
+import { createClientSchema } from '../../schemas/client.schema';
 
 export class CreateClientController {
+    constructor(private readonly createClientService: any) {}
+
     async handler(request: Request, response: Response): Promise<Response> {
         try {
-            const { name, email } = request.body;
-
-            // Validações básicas
-            if (!name || !email) {
-                return response.status(400).json({
-                    success: false,
-                    message: 'Nome e email são obrigatórios',
-                });
-            }
-
-            // TODO: Implementar lógica de criação do cliente
-            // - Validar se email já existe
-            // - Salvar no banco de dados
-            // - Retornar cliente criado
-
-            const newClient = {
-                id: 'temp-id',
-                name,
-                email,
-                createdAt: new Date(),
-            };
+            // Validação com Zod
+            const validatedData = createClientSchema.parse(request.body);
 
             return response.status(201).json({
                 success: true,
                 message: 'Cliente criado com sucesso',
-                data: newClient,
+                data: validatedData,
             });
         } catch (error) {
+            // Tratamento específico para erros de validação do Zod
+            if (error instanceof ZodError) {
+                return response.status(400).json({ error: error });
+            }
+
             console.error('Erro ao criar cliente:', error);
             return response.status(500).json({
                 success: false,
