@@ -8,7 +8,7 @@ export class CreateClientController {
     async handler(request: Request, response: Response): Promise<Response> {
         try {
             // Validação com Zod
-            const validatedData = createClientSchema.parse(request.body);
+            const validatedData = createClientSchema.parse(request.body ?? {});
 
             return response.status(201).json({
                 success: true,
@@ -18,7 +18,17 @@ export class CreateClientController {
         } catch (error) {
             // Tratamento específico para erros de validação do Zod
             if (error instanceof ZodError) {
-                return response.status(400).json({ error: error });
+                const formattedErrors = error.issues.map(issue => ({
+                    field: issue.path.join('.'),
+                    message: issue.message,
+                    code: issue.code,
+                }));
+
+                return response.status(400).json({
+                    success: false,
+                    message: 'Dados de entrada inválidos',
+                    errors: formattedErrors,
+                });
             }
 
             console.error('Erro ao criar cliente:', error);
