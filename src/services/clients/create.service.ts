@@ -1,3 +1,4 @@
+import type { Client } from '../../../generated/prisma';
 import { prisma } from '../../database/prisma';
 interface ICreateClient {
     name: string;
@@ -5,10 +6,7 @@ interface ICreateClient {
 }
 
 export class CreateClientService {
-    async execute({
-        name,
-        email,
-    }: ICreateClient): Promise<{ id: string; name: string; email: string }> {
+    async execute({ name, email }: ICreateClient): Promise<Client> {
         // Check if user already exists
         const clientExists = await prisma.client.findFirst({
             where: {
