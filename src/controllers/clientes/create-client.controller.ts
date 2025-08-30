@@ -11,12 +11,12 @@ export class CreateClientController {
             const validatedData = createClientSchema.parse(request.body ?? {});
 
             // Chamar o serviço para criar o cliente
-            //const result = await this.createClientService.create(validatedData);
+            const result = await this.createClientService.create(validatedData);
 
             return response.status(201).json({
                 success: true,
                 message: 'Cliente criado com sucesso',
-                data: validatedData,
+                data: result,
             });
         } catch (error) {
             // Tratamento específico para erros de validação do Zod

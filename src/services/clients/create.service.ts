@@ -1,5 +1,4 @@
-import { prisma } from '../../database/prismaClient';
-
+import { prisma } from '../../database/prisma';
 interface ICreateClient {
     name: string;
     email: string;
