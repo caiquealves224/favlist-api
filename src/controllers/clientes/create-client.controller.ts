@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { createClientSchema } from '../../schemas/client.schema';
+import { CreateClientService } from '../../services/clients/create.service';
 
 export class CreateClientController {
-    constructor(private readonly createClientService: any) {}
+    constructor(private readonly createClientService: CreateClientService) {}
 
     async handler(request: Request, response: Response): Promise<Response> {
         try {
@@ -11,7 +12,8 @@ export class CreateClientController {
             const validatedData = createClientSchema.parse(request.body ?? {});
 
             // Chamar o serviço para criar o cliente
-            const result = await this.createClientService.create(validatedData);
+            const result =
+                await this.createClientService.execute(validatedData);
 
             return response.status(201).json({
                 success: true,

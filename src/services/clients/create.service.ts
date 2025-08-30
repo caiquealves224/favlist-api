@@ -5,7 +5,10 @@ interface ICreateClient {
 }
 
 export class CreateClientService {
-    async execute({ name, email }: ICreateClient): Promise<any> {
+    async execute({
+        name,
+        email,
+    }: ICreateClient): Promise<{ id: string; name: string; email: string }> {
         // Check if user already exists
         const clientExists = await prisma.client.findFirst({
             where: {
