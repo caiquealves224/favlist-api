@@ -14,16 +14,13 @@ export class CreateClientService {
             },
         });
 
-        if (clientExists) {
+        if (clientExists !== null) {
             throw new Error('Client already exists');
         }
 
         // Create user
         const client = await prisma.client.create({
-            data: {
-                name,
-                email,
-            },
+            data: { name, email },
         });
 
         return client;

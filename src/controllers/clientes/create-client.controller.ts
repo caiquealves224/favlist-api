@@ -16,7 +16,7 @@ export class CreateClientController {
             return response.status(201).json({
                 success: true,
                 message: 'Cliente criado com sucesso',
-                data: result,
+                data: validatedData,
             });
         } catch (error) {
             // Tratamento específico para erros de validação do Zod

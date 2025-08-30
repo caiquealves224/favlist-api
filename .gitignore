@@ -123,3 +123,5 @@ out/
 # Backup files
 *.bak
 *.backup
+
+/generated/prisma
