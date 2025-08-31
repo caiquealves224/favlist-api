@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-export class GetClientsController {
+export class ListClientsController {
     async handler(request: Request, response: Response): Promise<Response> {
         try {
             const { page = '1', limit = '10', search } = request.query;
