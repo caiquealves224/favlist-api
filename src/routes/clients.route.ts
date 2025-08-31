@@ -3,6 +3,8 @@ import { CreateClientController } from '../controllers/clientes';
 import { UpdateClientController } from '../controllers/clientes';
 import { DeleteClientController } from '../controllers/clientes';
 import { GetClientsController } from '../controllers/clientes';
+import { CreateClientService } from '../services/clients/create.service';
+import { UpdateClientService } from '../services/clients/update.service';
 
 const router = Router();
 
@@ -11,11 +13,17 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 router.post('/', (req: Request, res: Response) => {
-    return new CreateClientController({}).handler(req, res);
+    return new CreateClientController(new CreateClientService()).handler(
+        req,
+        res
+    );
 });
 
 router.patch('/:id', (req: Request, res: Response) => {
-    return new UpdateClientController().handler(req, res);
+    return new UpdateClientController(new UpdateClientService()).handler(
+        req,
+        res
+    );
 });
 
 router.delete('/:id', (req: Request, res: Response) => {
