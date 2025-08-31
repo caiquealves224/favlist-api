@@ -8,6 +8,7 @@ export class GetClientService {
             where: {
                 OR: [{ id: identifier }, { email: identifier }],
             },
+            include: { favorites: true },
         });
         if (!client) {
             throw new AppError('Cliente não encontrado', 404);

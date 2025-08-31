@@ -27,6 +27,7 @@ export class ListClientService {
                       },
                   }
                 : {},
+            include: { favorites: true },
         });
 
         const total = await prisma.client.count({
