@@ -24,7 +24,14 @@ model Client {
 model Favorite {
   id        String   @id @default(uuid())
   client    Client   @relation(fields: [clientId], references: [id])
-  clientId  String   @unique
+  itemId    String
+  title     String
+  imageUrl  String
+  // Preço em centavos para evitar problemas com ponto flutuante
+  price     Int
+  clientId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([clientId, itemId]) // garante que o mesmo cliente não favorite o mesmo item duas vezes
 }
