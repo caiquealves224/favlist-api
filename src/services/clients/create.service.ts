@@ -13,7 +13,7 @@ export class CreateClientService {
         });
 
         if (clientExists !== null) {
-            throw new AppError('Client already exists', 409);
+            throw new AppError('Já existe um cliente com este e-mail', 409);
         }
 
         const client = await prisma.client.create({ data: { name, email } });

@@ -10,7 +10,7 @@ export class GetClientService {
             },
         });
         if (!client) {
-            throw new AppError('Client not found', 404);
+            throw new AppError('Cliente não encontrado', 404);
         }
 
         return client;
