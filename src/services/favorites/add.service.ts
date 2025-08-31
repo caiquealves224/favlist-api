@@ -46,12 +46,12 @@ export default class AddFavoritesService {
     }> {
         try {
             const response = await fetch(
-                `${process.env.FAVORITE_API_URL as string}/${itemId}`,
+                `${process.env.PRODUCTS_API_URL as string}/${itemId}`,
                 {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-api-key': process.env.FAVORITE_API_KEY as string,
+                        'x-api-key': process.env.PRODUCTS_API_KEY as string,
                     },
                 }
             );
