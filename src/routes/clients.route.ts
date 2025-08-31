@@ -6,12 +6,16 @@ import { GetClientsController } from '../controllers/clientes';
 import { CreateClientService } from '../services/clients/create.service';
 import { UpdateClientService } from '../services/clients/update.service';
 import { validate } from '../middlewares/validate-request';
-import { createClientSchema } from '../schemas/client.schema';
+import {
+    createClientSchema,
+    updateClientSchema,
+} from '../schemas/client.schema';
+import { GetClientService } from '../services/clients/get.service';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response) => {
-    return new GetClientsController().handler(req, res);
+router.get('/:id', (req: Request, res: Response) => {
+    return new GetClientsController(new GetClientService()).handler(req, res);
 });
 
 router.post(
@@ -25,12 +29,16 @@ router.post(
     }
 );
 
-router.patch('/:id', (req: Request, res: Response) => {
-    return new UpdateClientController(new UpdateClientService()).handler(
-        req,
-        res
-    );
-});
+router.patch(
+    '/:id',
+    validate(updateClientSchema),
+    (req: Request, res: Response) => {
+        return new UpdateClientController(new UpdateClientService()).handler(
+            req,
+            res
+        );
+    }
+);
 
 router.delete('/:id', (req: Request, res: Response) => {
     return new DeleteClientController().handler(req, res);
