@@ -15,6 +15,7 @@ import {
 } from '../schemas/client.schema';
 import { GetClientService } from '../services/clients/get.service';
 import { ListClientService } from '../services/clients/list.service';
+import favoritesRoutes from './favorites.route';
 
 const router = Router();
 
@@ -51,5 +52,7 @@ router.patch(
 router.delete('/:id', (req: Request, res: Response) => {
     return new DeleteClientController().handler(req, res);
 });
+
+router.use('/:clientId/favorites', favoritesRoutes);
 
 export default router;
