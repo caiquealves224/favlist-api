@@ -19,26 +19,28 @@ export class ListClientService {
         const clients = await prisma.client.findMany({
             skip: (page - 1) * limit,
             take: limit,
-            where: search
-                ? {
-                      name: {
-                          contains: search,
-                          mode: 'insensitive',
-                      },
-                  }
-                : {},
+            where:
+                search != null
+                    ? {
+                          name: {
+                              contains: search,
+                              mode: 'insensitive',
+                          },
+                      }
+                    : {},
             include: { favorites: true },
         });
 
         const total = await prisma.client.count({
-            where: search
-                ? {
-                      name: {
-                          contains: search,
-                          mode: 'insensitive',
-                      },
-                  }
-                : {},
+            where:
+                search != null
+                    ? {
+                          name: {
+                              contains: search,
+                              mode: 'insensitive',
+                          },
+                      }
+                    : {},
         });
         return {
             clients,
