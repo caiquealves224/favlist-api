@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import { ListClientService } from '../../services/clients/list.service';
 
 export class ListClientsController {
+    constructor(private listClientService: ListClientService) {}
     async handler(request: Request, response: Response): Promise<Response> {
         try {
             const { page = '1', limit = '10', search } = request.query;
@@ -23,28 +25,11 @@ export class ListClientsController {
                 });
             }
 
-            // TODO: Implementar lógica de busca de clientes
-            // - Buscar no banco de dados com paginação
-            // - Aplicar filtros de busca se fornecidos
-            // - Retornar lista paginada de clientes
-
-            // Dados simulados para exemplo
-            const mockClients = [
-                {
-                    id: '1',
-                    name: 'João Silva',
-                    email: 'joao@email.com',
-                    phone: '(11) 99999-9999',
-                    createdAt: new Date(),
-                },
-                {
-                    id: '2',
-                    name: 'Maria Santos',
-                    email: 'maria@email.com',
-                    phone: '(11) 88888-8888',
-                    createdAt: new Date(),
-                },
-            ];
+            const result = await this.listClientService.execute({
+                page: pageNumber,
+                limit: limitNumber,
+                search: search as string | undefined,
+            });
 
             const totalClients = 2; // TODO: Implementar contagem real
             const totalPages = Math.ceil(totalClients / limitNumber);
@@ -53,11 +38,11 @@ export class ListClientsController {
                 success: true,
                 message: 'Clientes encontrados com sucesso',
                 data: {
-                    clients: mockClients,
+                    clients: result.clients,
                     pagination: {
                         page: pageNumber,
                         limit: limitNumber,
-                        total: totalClients,
+                        total: result.total,
                         totalPages,
                         hasNext: pageNumber < totalPages,
                         hasPrev: pageNumber > 1,

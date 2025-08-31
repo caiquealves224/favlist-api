@@ -1,5 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { CreateClientController } from '../controllers/clientes';
+import {
+    CreateClientController,
+    ListClientsController,
+} from '../controllers/clientes';
 import { UpdateClientController } from '../controllers/clientes';
 import { DeleteClientController } from '../controllers/clientes';
 import { GetClientsController } from '../controllers/clientes';
@@ -11,8 +14,13 @@ import {
     updateClientSchema,
 } from '../schemas/client.schema';
 import { GetClientService } from '../services/clients/get.service';
+import { ListClientService } from '../services/clients/list.service';
 
 const router = Router();
+
+router.get('/', (req: Request, res: Response) => {
+    return new ListClientsController(new ListClientService()).handler(req, res);
+});
 
 router.get('/:id', (req: Request, res: Response) => {
     return new GetClientsController(new GetClientService()).handler(req, res);
