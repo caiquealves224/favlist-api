@@ -32,6 +32,9 @@ src/
 │   │   ├── get-clients.controller.ts
 │   │   └── index.ts
 │   └── favorites/       # Controllers de favoritos
+|       └──
+|       └──
+|       └──
 ├── routes/              # Definição das rotas
 │   ├── clients.route.ts
 │   ├── favorites.route.ts
@@ -47,7 +50,6 @@ src/
 ### Pré-requisitos
 
 - Node.js 18+
-- npm 9+
 
 ### Instalação
 
@@ -108,9 +110,10 @@ npm start
 ### Favoritos
 
 | Método | Endpoint         | Descrição                 |
-| ------ | ---------------- | ------------------------- |
-| `GET`  | `/api/favorites` | Lista todos os favoritos  |
-| `POST` | `/api/favorites` | Adiciona um novo favorito |
+| -------- | ---------------- | ------------------------- |
+| `GET`    | `/api/favorites` | Lista todos os favoritos  |
+| `POST`   | `/api/favorites` | Adiciona um novo favorito |
+| `DELETE` | `/api/favorites` | Remove favorito           |
 
 ## 🔧 Configuração
 
@@ -156,7 +159,6 @@ Content-Type: application/json
         "id": "temp-id",
         "name": "João Silva",
         "email": "joao@email.com",
-        "phone": "(11) 99999-9999",
         "createdAt": "2024-01-15T10:30:00.000Z"
     }
 }
@@ -182,28 +184,6 @@ npm run test:coverage
 - **Controllers:** `CreateClientController`, `UpdateClientController`
 - **Routes:** `clients.route.ts`, `favorites.route.ts`
 - **Services:** `client.service.ts`, `favorite.service.ts`
-
-### Estrutura de Controller
-
-```typescript
-export class CreateClientController {
-    async handler(request: Request, response: Response): Promise<Response> {
-        try {
-            // Lógica do controller
-            return response.status(201).json({
-                success: true,
-                message: 'Cliente criado com sucesso',
-                data: newClient,
-            });
-        } catch (error) {
-            return response.status(500).json({
-                success: false,
-                message: 'Erro interno do servidor',
-            });
-        }
-    }
-}
-```
 
 ## 📄 Licença
 

@@ -1,13 +1,14 @@
 import { Router, Request, Response } from 'express';
+import { validate } from '../middlewares/validate-request';
+import { FavoriteSchema } from '../schemas/favorites.schema';
 
 const router = Router({ mergeParams: true }); // mergeParams para acessar clientId
 
-// Rotas com tipagem explícita
 router.get('/', (req: Request, res: Response) => {
     res.send('Favorites');
 });
 
-router.post('/', (req: Request, res: Response) => {
+router.post('/', validate(FavoriteSchema), (req: Request, res: Response) => {
     res.send('Add to Favorites');
 });
 
