@@ -5,6 +5,8 @@ import { DeleteClientController } from '../controllers/clientes';
 import { GetClientsController } from '../controllers/clientes';
 import { CreateClientService } from '../services/clients/create.service';
 import { UpdateClientService } from '../services/clients/update.service';
+import { validate } from '../middlewares/validate-request';
+import { createClientSchema } from '../schemas/client.schema';
 
 const router = Router();
 
@@ -12,12 +14,16 @@ router.get('/', (req: Request, res: Response) => {
     return new GetClientsController().handler(req, res);
 });
 
-router.post('/', (req: Request, res: Response) => {
-    return new CreateClientController(new CreateClientService()).handler(
-        req,
-        res
-    );
-});
+router.post(
+    '/',
+    validate(createClientSchema),
+    (req: Request, res: Response) => {
+        return new CreateClientController(new CreateClientService()).handler(
+            req,
+            res
+        );
+    }
+);
 
 router.patch('/:id', (req: Request, res: Response) => {
     return new UpdateClientController(new UpdateClientService()).handler(

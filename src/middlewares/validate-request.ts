@@ -7,11 +7,17 @@ export const validate =
         try {
             schema.parse(req.body);
             next();
-        } catch (err: any) {
+        } catch (error: any) {
+            const formattedErrors = error.issues.map(issue => ({
+                field: issue.path.join('.'),
+                message: issue.message,
+                code: issue.code,
+            }));
+
             return res.status(400).json({
                 status: 'error',
                 message: 'Validation failed',
-                errors: err.errors, // array de erros detalhados do Zod
+                errors: formattedErrors, // array de erros detalhados do Zod
             });
         }
     };

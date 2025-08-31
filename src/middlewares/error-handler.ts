@@ -15,6 +15,7 @@ export const errorHandler = (
     }
 
     console.error(err); // log para debug
+    console.error(typeof err); // log para debug
     return res.status(500).json({
         status: 'error',
         message: 'Internal server error',
