@@ -199,8 +199,7 @@ paths:
               description: ID único do cliente
               schema:
                   type: string
-                  pattern: '^cl_[a-zA-Z0-9]{9}$'
-              example: 'cl_123456789'
+              example: 'caiquealves224@gmail.com'
 
         get:
             tags:
