@@ -9,7 +9,7 @@ export default class AddFavoritesController {
             itemId: request.body.itemId,
         });
 
-        return response.status(200).json({
+        return response.status(201).json({
             success: true,
             message: 'Favorito adicionado com sucesso',
             data: result,
