@@ -109,7 +109,7 @@ npm start
 
 ### Favoritos
 
-| Método | Endpoint         | Descrição                 |
+| Método   | Endpoint         | Descrição                 |
 | -------- | ---------------- | ------------------------- |
 | `GET`    | `/api/favorites` | Lista todos os favoritos  |
 | `POST`   | `/api/favorites` | Adiciona um novo favorito |

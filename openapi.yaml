@@ -1,0 +1,739 @@
+openapi: 3.0.3
+info:
+    title: FavList API
+    description: |
+        API REST para gerenciamento de listas de favoritos.
+
+        ## Funcionalidades
+        - Gerenciamento de clientes (CRUD completo)
+        - Sistema de favoritos por cliente
+        - Validação de dados
+        - Tratamento de erros padronizado
+
+        ## Tecnologias
+        - Node.js + TypeScript
+        - Express.js
+        - Arquitetura MVC
+        - ESLint + Prettier
+    version: 1.0.0
+    contact:
+        name: Caique Alves
+        email: caiquealves224@gmail.com
+        url: https://github.com/caiquealves224
+    license:
+        name: MIT
+        url: https://opensource.org/licenses/MIT
+
+servers:
+    - url: http://localhost:3000/api
+      description: Servidor de Desenvolvimento
+
+tags:
+    - name: Clientes
+      description: Operações relacionadas aos clientes
+    - name: Favoritos
+      description: Operações relacionadas aos favoritos
+    - name: Sistema
+      description: Endpoints do sistema
+
+paths:
+    /clients:
+        get:
+            tags:
+                - Clientes
+            summary: Lista todos os clientes
+            description: Retorna uma lista paginada de todos os clientes cadastrados
+            parameters:
+                - name: page
+                  in: query
+                  description: Número da página
+                  required: false
+                  schema:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                  example: 1
+                - name: limit
+                  in: query
+                  description: Número de itens por página
+                  required: false
+                  schema:
+                      type: integer
+                      minimum: 1
+                      maximum: 100
+                      default: 10
+                  example: 10
+                - name: search
+                  in: query
+                  description: Termo de busca por nome ou email
+                  required: false
+                  schema:
+                      type: string
+                  example: 'joão'
+            responses:
+                '200':
+                    description: Lista de clientes retornada com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Clientes encontrados com sucesso'
+                                data:
+                                    clients:
+                                        - id: 'cl_123456789'
+                                          name: 'João Silva'
+                                          email: 'joao@email.com'
+                                          createdAt: '2024-01-15T10:30:00.000Z'
+                                          updatedAt: '2024-01-15T10:30:00.000Z'
+                                        - id: 'cl_987654321'
+                                          name: 'Maria Santos'
+                                          email: 'maria@email.com'
+                                          createdAt: '2024-01-15T11:00:00.000Z'
+                                          updatedAt: '2024-01-15T11:00:00.000Z'
+                                    pagination:
+                                        page: 1
+                                        limit: 10
+                                        total: 2
+                                        totalPages: 1
+                                        hasNext: false
+                                        hasPrev: false
+                '400':
+                    description: Parâmetros inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Página deve ser um número maior que 0'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Erro interno do servidor'
+
+        post:
+            tags:
+                - Clientes
+            summary: Cria um novo cliente
+            description: Cadastra um novo cliente no sistema
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - name
+                                - email
+                            properties:
+                                name:
+                                    type: string
+                                    description: Nome completo do cliente
+                                    minLength: 2
+                                    maxLength: 100
+                                    example: 'João Silva'
+                                email:
+                                    type: string
+                                    format: email
+                                    description: Email do cliente
+                                    example: 'joao@email.com'
+                        example:
+                            name: 'João Silva'
+                            email: 'joao@email.com'
+            responses:
+                '201':
+                    description: Cliente criado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Cliente criado com sucesso'
+                                data:
+                                    id: 'cl_123456789'
+                                    name: 'João Silva'
+                                    email: 'joao@email.com'
+                                    createdAt: '2024-01-15T10:30:00.000Z'
+                                    updatedAt: '2024-01-15T10:30:00.000Z'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Nome e email são obrigatórios'
+                                errors:
+                                    - field: 'email'
+                                      message: 'Email inválido'
+                '409':
+                    description: Email já cadastrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Email já está cadastrado'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+    /clients/{id}:
+        parameters:
+            - name: id
+              in: path
+              required: true
+              description: ID único do cliente
+              schema:
+                  type: string
+                  pattern: '^cl_[a-zA-Z0-9]{9}$'
+              example: 'cl_123456789'
+
+        get:
+            tags:
+                - Clientes
+            summary: Busca um cliente específico
+            description: Retorna os dados de um cliente específico pelo ID
+            responses:
+                '200':
+                    description: Cliente encontrado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Cliente encontrado com sucesso'
+                                data:
+                                    id: 'cl_123456789'
+                                    name: 'João Silva'
+                                    email: 'joao@email.com'
+                                    createdAt: '2024-01-15T10:30:00.000Z'
+                                    updatedAt: '2024-01-15T10:30:00.000Z'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Cliente não encontrado'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+        patch:
+            tags:
+                - Clientes
+            summary: Atualiza um cliente
+            description: Atualiza os dados de um cliente existente
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                    description: Nome completo do cliente
+                                    minLength: 2
+                                    maxLength: 100
+                                    example: 'João Silva Atualizado'
+                                email:
+                                    type: string
+                                    format: email
+                                    description: Email do cliente
+                                    example: 'joao.novo@email.com'
+                        example:
+                            name: 'João Silva Atualizado'
+                            email: 'joao.novo@email.com'
+            responses:
+                '200':
+                    description: Cliente atualizado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Cliente atualizado com sucesso'
+                                data:
+                                    id: 'cl_123456789'
+                                    name: 'João Silva Atualizado'
+                                    email: 'joao.novo@email.com'
+                                    createdAt: '2024-01-15T10:30:00.000Z'
+                                    updatedAt: '2024-01-15T12:00:00.000Z'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+        delete:
+            tags:
+                - Clientes
+            summary: Remove um cliente
+            description: Remove um cliente do sistema
+            responses:
+                '200':
+                    description: Cliente removido com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Cliente excluído com sucesso'
+                                data:
+                                    id: 'cl_123456789'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '409':
+                    description: Cliente possui dependências
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Cliente possui favoritos e não pode ser excluído'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+    /clients/{clientId}/favorites:
+        parameters:
+            - name: clientId
+              in: path
+              required: true
+              description: ID do cliente
+              schema:
+                  type: string
+                  pattern: '^cl_[a-zA-Z0-9]{9}$'
+              example: 'cl_123456789'
+
+        get:
+            tags:
+                - Favoritos
+            summary: Lista favoritos de um cliente
+            description: Retorna todos os favoritos de um cliente específico
+            responses:
+                '200':
+                    description: Favoritos encontrados com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Favoritos encontrados com sucesso'
+                                data:
+                                    - id: 'fav_123456789'
+                                      clientId: 'cl_123456789'
+                                      itemId: 'item_123456789'
+                                      itemType: 'product'
+                                      createdAt: '2024-01-15T10:30:00.000Z'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+        post:
+            tags:
+                - Favoritos
+            summary: Adiciona favorito para um cliente
+            description: Adiciona um item à lista de favoritos de um cliente
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - itemId
+                                - itemType
+                            properties:
+                                itemId:
+                                    type: string
+                                    description: ID do item a ser favoritado
+                                    example: 'item_123456789'
+                                itemType:
+                                    type: string
+                                    enum: [product, service, content]
+                                    description: Tipo do item
+                                    example: 'product'
+                        example:
+                            itemId: 'item_123456789'
+                            itemType: 'product'
+            responses:
+                '201':
+                    description: Favorito adicionado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Favorito adicionado com sucesso'
+                                data:
+                                    id: 'fav_123456789'
+                                    clientId: 'cl_123456789'
+                                    itemId: 'item_123456789'
+                                    itemType: 'product'
+                                    createdAt: '2024-01-15T10:30:00.000Z'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '409':
+                    description: Item já está na lista de favoritos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+    /favorites:
+        get:
+            tags:
+                - Favoritos
+            summary: Lista todos os favoritos
+            description: Retorna uma lista de todos os favoritos cadastrados
+            parameters:
+                - name: clientId
+                  in: query
+                  description: ID do cliente para filtrar favoritos
+                  required: false
+                  schema:
+                      type: string
+                      pattern: '^cl_[a-zA-Z0-9]{9}$'
+                  example: 'cl_123456789'
+                - name: itemType
+                  in: query
+                  description: Tipo do item para filtrar
+                  required: false
+                  schema:
+                      type: string
+                      enum: [product, service, content]
+                  example: 'product'
+            responses:
+                '200':
+                    description: Lista de favoritos retornada com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Favoritos encontrados com sucesso'
+                                data:
+                                    - id: 'fav_123456789'
+                                      clientId: 'cl_123456789'
+                                      itemId: 'item_123456789'
+                                      itemType: 'product'
+                                      createdAt: '2024-01-15T10:30:00.000Z'
+                '400':
+                    description: Parâmetros inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+        post:
+            tags:
+                - Favoritos
+            summary: Adiciona um novo favorito
+            description: Adiciona um item à lista de favoritos de um cliente
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - clientId
+                                - itemId
+                                - itemType
+                            properties:
+                                clientId:
+                                    type: string
+                                    description: ID do cliente
+                                    pattern: '^cl_[a-zA-Z0-9]{9}$'
+                                    example: 'cl_123456789'
+                                itemId:
+                                    type: string
+                                    description: ID do item a ser favoritado
+                                    example: 'item_123456789'
+                                itemType:
+                                    type: string
+                                    enum: [product, service, content]
+                                    description: Tipo do item
+                                    example: 'product'
+                        example:
+                            clientId: 'cl_123456789'
+                            itemId: 'item_123456789'
+                            itemType: 'product'
+            responses:
+                '201':
+                    description: Favorito adicionado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Favorito adicionado com sucesso'
+                                data:
+                                    id: 'fav_123456789'
+                                    clientId: 'cl_123456789'
+                                    itemId: 'item_123456789'
+                                    itemType: 'product'
+                                    createdAt: '2024-01-15T10:30:00.000Z'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '404':
+                    description: Cliente ou item não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '409':
+                    description: Item já está na lista de favoritos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+    /favorites/{id}:
+        parameters:
+            - name: id
+              in: path
+              required: true
+              description: ID único do favorito
+              schema:
+                  type: string
+                  pattern: '^fav_[a-zA-Z0-9]{9}$'
+              example: 'fav_123456789'
+
+        delete:
+            tags:
+                - Favoritos
+            summary: Remove um favorito
+            description: Remove um item da lista de favoritos
+            responses:
+                '200':
+                    description: Favorito removido com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SuccessResponse'
+                            example:
+                                success: true
+                                message: 'Favorito removido com sucesso'
+                                data:
+                                    id: 'fav_123456789'
+                '404':
+                    description: Favorito não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+components:
+    schemas:
+        Client:
+            type: object
+            required:
+                - name
+                - email
+            properties:
+                id:
+                    type: string
+                    pattern: '^cl_[a-zA-Z0-9]{9}$'
+                    description: ID único do cliente
+                    example: 'cl_123456789'
+                name:
+                    type: string
+                    minLength: 2
+                    maxLength: 100
+                    description: Nome completo do cliente
+                    example: 'João Silva'
+                email:
+                    type: string
+                    format: email
+                    description: Email do cliente
+                    example: 'joao@email.com'
+
+                createdAt:
+                    type: string
+                    format: date-time
+                    description: Data de criação
+                    example: '2024-01-15T10:30:00.000Z'
+                updatedAt:
+                    type: string
+                    format: date-time
+                    description: Data da última atualização
+                    example: '2024-01-15T10:30:00.000Z'
+
+        Favorite:
+            type: object
+            required:
+                - clientId
+                - itemId
+                - itemType
+            properties:
+                id:
+                    type: string
+                    pattern: '^fav_[a-zA-Z0-9]{9}$'
+                    description: ID único do favorito
+                    example: 'fav_123456789'
+                clientId:
+                    type: string
+                    pattern: '^cl_[a-zA-Z0-9]{9}$'
+                    description: ID do cliente
+                    example: 'cl_123456789'
+                itemId:
+                    type: string
+                    description: ID do item favoritado
+                    example: 'item_123456789'
+                itemType:
+                    type: string
+                    enum: [product, service, content]
+                    description: Tipo do item favoritado
+                    example: 'product'
+                createdAt:
+                    type: string
+                    format: date-time
+                    description: Data de criação
+                    example: '2024-01-15T10:30:00.000Z'
+
+        Error:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: false
+                message:
+                    type: string
+                    description: Mensagem de erro
+                    example: 'Erro interno do servidor'
+                errors:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            field:
+                                type: string
+                                example: 'email'
+                            message:
+                                type: string
+                                example: 'Email inválido'
+
+        SuccessResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                    example: true
+                message:
+                    type: string
+                    description: Mensagem de sucesso
+                    example: 'Operação realizada com sucesso'
+                data:
+                    type: object
+                    description: Dados da resposta
+
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Token JWT para autenticação
+
+security:
+    - BearerAuth: []
+
+externalDocs:
+    description: 'Documentação completa do projeto'
+    url: 'https://github.com/caiquealves224/favlist-api'
