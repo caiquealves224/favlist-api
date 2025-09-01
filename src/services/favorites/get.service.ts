@@ -8,12 +8,19 @@ export default class GetFavoritesService {
         itemId,
     }: {
         clientId: string;
-        itemId: string;
-    }): Promise<Favorite> {
+        itemId?: string;
+    }): Promise<Favorite | Favorite[]> {
         const client = await prisma.client.findUnique({
             where: { id: clientId },
         });
         if (!client) throw new AppError('Client not found', 404);
+
+        if (itemId == null) {
+            const favorites = await prisma.favorite.findMany({
+                where: { clientId },
+            });
+            return favorites;
+        }
 
         const favorite = await prisma.favorite.findUnique({
             where: {

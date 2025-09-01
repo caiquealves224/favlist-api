@@ -11,7 +11,10 @@ export default class GetFavoritesController {
 
         return response.status(200).json({
             success: true,
-            message: 'Favorito encontrado com sucesso',
+            message:
+                Array.isArray(result) && result.length > 0
+                    ? 'Favorito(s) encontrados com sucesso'
+                    : 'Nenhum favorito encontrado',
             data: result,
         });
     }

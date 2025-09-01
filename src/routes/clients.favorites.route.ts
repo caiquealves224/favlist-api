@@ -10,6 +10,10 @@ import DeleteFavoritesService from '../services/favorites/delete.service';
 
 const router = Router({ mergeParams: true }); // mergeParams para acessar clientId
 
+router.get('/', (req: Request, res: Response) =>
+    new GetFavoritesController(new GetFavoritesService()).handler(req, res)
+);
+
 router.get('/:itemId', (req: Request, res: Response) =>
     new GetFavoritesController(new GetFavoritesService()).handler(req, res)
 );
