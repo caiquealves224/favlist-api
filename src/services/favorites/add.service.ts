@@ -10,21 +10,20 @@ export default class AddFavoritesService {
         clientId: string;
         itemId: string;
     }): Promise<Favorite> {
+        const client = await prisma.client.findUnique({
+            where: { id: clientId },
+        });
+        if (!client) throw new AppError('Client not found', 404);
+
         const favoriteApiItem = await this.fetchProduct(itemId);
 
-        const favorite = await prisma.favorite.upsert({
-            where: {
-                clientId_itemId: {
-                    clientId,
-                    itemId,
-                },
-            },
-            update: {
-                price: favoriteApiItem.price,
-                imageUrl: favoriteApiItem.image,
-                title: favoriteApiItem.title,
-            },
-            create: {
+        const exists = await prisma.favorite.findUnique({
+            where: { clientId_itemId: { clientId, itemId } },
+        });
+        if (exists) throw new AppError('Product already in favorites', 409);
+
+        const favorite = await prisma.favorite.create({
+            data: {
                 clientId,
                 itemId,
                 price: favoriteApiItem.price,
