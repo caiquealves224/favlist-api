@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import apiRoutes from './routes';
 import { errorHandler } from './middlewares/error-handler';
 import swaggerUi from 'swagger-ui-express';
@@ -17,6 +17,13 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Usar todas as rotas da API em um único ponto
 app.use('/api', apiRoutes);
+
+app.use((req: Request, res: Response) => {
+    res.status(404).json({
+        error: 'Not Found',
+        message: `Rota ${req.originalUrl} não existe`,
+    });
+});
 
 app.use(errorHandler);
 
