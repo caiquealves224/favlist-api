@@ -7,6 +7,7 @@ export const authenticate = (
     next: NextFunction
 ) => {
     const authHeader = req.headers.authorization;
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!authHeader) return res.status(401).json({ message: 'No token' });
 
     const token = authHeader.split(' ')[1];
