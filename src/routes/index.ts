@@ -7,6 +7,8 @@ apiRouter.get('/health-check', (req, res) => {
     res.status(200).send('OK');
 });
 
+apiRouter.use('/auth', authRoutes);
+
 apiRouter.use('/clients', clientsRoutes);
 
 // Exportar o router consolidado
