@@ -5,14 +5,19 @@ info:
         API REST para gerenciamento de listas de favoritos.
 
         ## Funcionalidades
+        - Sistema de autenticação JWT
         - Gerenciamento de clientes (CRUD completo)
         - Sistema de favoritos por cliente
-        - Validação de dados
+        - Validação de dados com Zod
         - Tratamento de erros padronizado
+        - Middlewares de segurança
 
         ## Tecnologias
         - Node.js + TypeScript
-        - Express.js
+        - Express.js com middlewares customizados
+        - Prisma ORM
+        - JWT para autenticação
+        - Zod para validação
         - Arquitetura MVC
         - ESLint + Prettier
     version: 1.0.0
@@ -29,6 +34,8 @@ servers:
       description: Servidor de Desenvolvimento
 
 tags:
+    - name: Autenticação
+      description: Endpoints de autenticação e autorização
     - name: Clientes
       description: Operações relacionadas aos clientes
     - name: Favoritos
@@ -37,12 +44,111 @@ tags:
       description: Endpoints do sistema
 
 paths:
+    /health-check:
+        get:
+            tags:
+                - Sistema
+            summary: Verificação de saúde da API
+            description: Endpoint para verificar se a API está funcionando
+            responses:
+                '200':
+                    description: API funcionando corretamente
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        example: 'ok'
+                                    timestamp:
+                                        type: string
+                                        format: date-time
+
+    /auth:
+        post:
+            tags:
+                - Autenticação
+            summary: Login do usuário
+            description: Autentica um usuário e retorna um token JWT
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - username
+                                - password
+                            properties:
+                                username:
+                                    type: string
+                                    description: Nome de usuário
+                                    example: 'admin'
+                                password:
+                                    type: string
+                                    description: Senha do usuário
+                                    example: 'admin'
+                        example:
+                            username: 'admin'
+                            password: 'admin'
+            responses:
+                '200':
+                    description: Login realizado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Login bem-sucedido'
+                                    token:
+                                        type: string
+                                        description: Token JWT para autenticação
+                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                                    user:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: integer
+                                                example: 1
+                                            username:
+                                                type: string
+                                                example: 'admin'
+                                            role:
+                                                type: string
+                                                example: 'admin'
+                '400':
+                    description: Dados de entrada inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationError'
+                '401':
+                    description: Credenciais inválidas
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Credenciais inválidas'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
     /clients:
         get:
             tags:
                 - Clientes
             summary: Lista todos os clientes
             description: Retorna uma lista paginada de todos os clientes cadastrados
+            security:
+                - BearerAuth: []
             parameters:
                 - name: page
                   in: query
@@ -104,25 +210,23 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Error'
-                            example:
-                                success: false
-                                message: 'Página deve ser um número maior que 0'
+                                $ref: '#/components/schemas/ValidationError'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
                 '500':
                     description: Erro interno do servidor
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error'
-                            example:
-                                success: false
-                                message: 'Erro interno do servidor'
 
         post:
             tags:
                 - Clientes
             summary: Cria um novo cliente
             description: Cadastra um novo cliente no sistema
+            security:
+                - BearerAuth: []
             requestBody:
                 required: true
                 content:
@@ -168,13 +272,9 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Error'
-                            example:
-                                success: false
-                                message: 'Nome e email são obrigatórios'
-                                errors:
-                                    - field: 'email'
-                                      message: 'Email inválido'
+                                $ref: '#/components/schemas/ValidationError'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
                 '409':
                     description: Email já cadastrado
                     content:
@@ -199,13 +299,15 @@ paths:
               description: ID único do cliente
               schema:
                   type: string
-              example: 'caiquealves224@gmail.com'
+              example: 'cl_123456789'
 
         get:
             tags:
                 - Clientes
             summary: Busca um cliente específico
             description: Retorna os dados de um cliente específico pelo ID
+            security:
+                - BearerAuth: []
             responses:
                 '200':
                     description: Cliente encontrado com sucesso
@@ -243,6 +345,8 @@ paths:
                 - Clientes
             summary: Atualiza um cliente
             description: Atualiza os dados de um cliente existente
+            security:
+                - BearerAuth: []
             requestBody:
                 required: true
                 content:
@@ -270,16 +374,33 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SuccessResponse'
-                            example:
-                                success: true
-                                message: 'Cliente atualizado com sucesso'
-                                data:
-                                    id: 'cl_123456789'
-                                    name: 'João Silva Atualizado'
-                                    email: 'joao.novo@email.com'
-                                    createdAt: '2024-01-15T10:30:00.000Z'
-                                    updatedAt: '2024-01-15T12:00:00.000Z'
+                                $ref: '#/components/schemas/Client'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationError'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '404':
+                    description: Cliente não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '409':
+                    description: Email já está em uso por outro cliente
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                 '400':
                     description: Dados inválidos
                     content:
@@ -304,18 +425,21 @@ paths:
                 - Clientes
             summary: Remove um cliente
             description: Remove um cliente do sistema
+            security:
+                - BearerAuth: []
             responses:
                 '200':
                     description: Cliente removido com sucesso
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SuccessResponse'
-                            example:
-                                success: true
-                                message: 'Cliente excluído com sucesso'
-                                data:
-                                    id: 'cl_123456789'
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Cliente excluído com sucesso'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
                 '404':
                     description: Cliente não encontrado
                     content:
@@ -323,6 +447,20 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '409':
+                    description: Cliente possui dependências
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                            example:
+                                success: false
+                                message: 'Cliente possui favoritos e não pode ser excluído'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                     description: Cliente possui dependências
                     content:
                         application/json:
@@ -346,7 +484,6 @@ paths:
               description: ID do cliente
               schema:
                   type: string
-                  pattern: '^cl_[a-zA-Z0-9]{9}$'
               example: 'cl_123456789'
 
         get:
@@ -354,22 +491,27 @@ paths:
                 - Favoritos
             summary: Lista favoritos de um cliente
             description: Retorna todos os favoritos de um cliente específico
+            security:
+                - BearerAuth: []
             responses:
                 '200':
                     description: Favoritos encontrados com sucesso
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/SuccessResponse'
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Favorite'
                             example:
-                                success: true
-                                message: 'Favoritos encontrados com sucesso'
-                                data:
-                                    - id: 'fav_123456789'
-                                      clientId: 'cl_123456789'
-                                      itemId: 'item_123456789'
-                                      itemType: 'product'
-                                      createdAt: '2024-01-15T10:30:00.000Z'
+                                - id: 'fav_123456789'
+                                  clientId: 'cl_123456789'
+                                  itemId: 'item_123456789'
+                                  createdAt: '2024-01-15T10:30:00.000Z'
+                                  favoriteData:
+                                      name: 'Produto Favorito'
+                                      price: 99.99
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
                 '404':
                     description: Cliente não encontrado
                     content:
@@ -388,6 +530,8 @@ paths:
                 - Favoritos
             summary: Adiciona favorito para um cliente
             description: Adiciona um item à lista de favoritos de um cliente
+            security:
+                - BearerAuth: []
             requestBody:
                 required: true
                 content:
@@ -396,21 +540,126 @@ paths:
                             type: object
                             required:
                                 - itemId
-                                - itemType
                             properties:
                                 itemId:
                                     type: string
                                     description: ID do item a ser favoritado
+                                    minLength: 1
                                     example: 'item_123456789'
-                                itemType:
-                                    type: string
-                                    enum: [product, service, content]
-                                    description: Tipo do item
-                                    example: 'product'
                         example:
                             itemId: 'item_123456789'
-                            itemType: 'product'
             responses:
+                '201':
+                    description: Favorito adicionado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Favorite'
+                '400':
+                    description: Dados inválidos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ValidationError'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '404':
+                    description: Cliente ou produto não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '409':
+                    description: Item já está na lista de favoritos
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+    /clients/{clientId}/favorites/{itemId}:
+        parameters:
+            - name: clientId
+              in: path
+              required: true
+              description: ID do cliente
+              schema:
+                  type: string
+              example: 'cl_123456789'
+            - name: itemId
+              in: path
+              required: true
+              description: ID do item favorito
+              schema:
+                  type: string
+              example: 'item_123456789'
+
+        get:
+            tags:
+                - Favoritos
+            summary: Busca favorito específico
+            description: Retorna um favorito específico de um cliente
+            security:
+                - BearerAuth: []
+            responses:
+                '200':
+                    description: Favorito encontrado com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Favorite'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '404':
+                    description: Cliente ou favorito não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+        delete:
+            tags:
+                - Favoritos
+            summary: Remove um favorito
+            description: Remove um item da lista de favoritos de um cliente
+            security:
+                - BearerAuth: []
+            responses:
+                '200':
+                    description: Favorito removido com sucesso
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: 'Favorito removido com sucesso'
+                '401':
+                    $ref: '#/components/responses/UnauthorizedError'
+                '404':
+                    description: Favorito não encontrado
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '500':
+                    description: Erro interno do servidor
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                 '201':
                     description: Favorito adicionado com sucesso
                     content:
@@ -629,7 +878,6 @@ components:
             properties:
                 id:
                     type: string
-                    pattern: '^cl_[a-zA-Z0-9]{9}$'
                     description: ID único do cliente
                     example: 'cl_123456789'
                 name:
@@ -643,7 +891,6 @@ components:
                     format: email
                     description: Email do cliente
                     example: 'joao@email.com'
-
                 createdAt:
                     type: string
                     format: date-time
@@ -658,34 +905,67 @@ components:
         Favorite:
             type: object
             required:
+                - id
                 - clientId
                 - itemId
-                - itemType
             properties:
                 id:
                     type: string
-                    pattern: '^fav_[a-zA-Z0-9]{9}$'
                     description: ID único do favorito
                     example: 'fav_123456789'
                 clientId:
                     type: string
-                    pattern: '^cl_[a-zA-Z0-9]{9}$'
                     description: ID do cliente
                     example: 'cl_123456789'
                 itemId:
                     type: string
                     description: ID do item favoritado
                     example: 'item_123456789'
-                itemType:
-                    type: string
-                    enum: [product, service, content]
-                    description: Tipo do item favoritado
-                    example: 'product'
                 createdAt:
                     type: string
                     format: date-time
                     description: Data de criação
                     example: '2024-01-15T10:30:00.000Z'
+                favoriteData:
+                    type: object
+                    description: Dados do produto/item favoritado obtidos de API externa
+                    properties:
+                        name:
+                            type: string
+                            example: 'Produto Favorito'
+                        price:
+                            type: number
+                            example: 99.99
+                        description:
+                            type: string
+                            example: 'Descrição do produto'
+                        image:
+                            type: string
+                            example: 'https://example.com/image.jpg'
+
+        ValidationError:
+            type: object
+            properties:
+                status:
+                    type: string
+                    example: 'error'
+                message:
+                    type: string
+                    example: 'Validation failed'
+                errors:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            field:
+                                type: string
+                                example: 'email'
+                            message:
+                                type: string
+                                example: 'Invalid input: expected string, received number'
+                            code:
+                                type: string
+                                example: 'invalid_type'
 
         Error:
             type: object
@@ -697,17 +977,6 @@ components:
                     type: string
                     description: Mensagem de erro
                     example: 'Erro interno do servidor'
-                errors:
-                    type: array
-                    items:
-                        type: object
-                        properties:
-                            field:
-                                type: string
-                                example: 'email'
-                            message:
-                                type: string
-                                example: 'Email inválido'
 
         SuccessResponse:
             type: object
@@ -722,6 +991,48 @@ components:
                 data:
                     type: object
                     description: Dados da resposta
+
+    responses:
+        UnauthorizedError:
+            description: Token de acesso não fornecido ou inválido
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+                                example: 'Token de acesso requerido'
+                    examples:
+                        noToken:
+                            summary: Token não fornecido
+                            value:
+                                message: 'Token de acesso requerido'
+                        invalidToken:
+                            summary: Token inválido
+                            value:
+                                message: 'Token inválido'
+
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: |
+                Token JWT para autenticação. 
+                
+                Para obter o token, faça login no endpoint /auth com as credenciais:
+                - username: admin
+                - password: admin
+                
+                En seguida, use o token retornado no header Authorization: Bearer {token}
+
+security:
+    - BearerAuth: []
+
+externalDocs:
+    description: 'Documentação completa do projeto'
+    url: 'https://github.com/caiquealves224/favlist-api'
 
     securitySchemes:
         BearerAuth:

@@ -10,8 +10,9 @@ export default class AddFavoritesService {
         clientId: string;
         itemId: string;
     }): Promise<Favorite> {
+        console.log('Adding favorite for clientId:', clientId, 'itemId:', itemId);
         const client = await prisma.client.findUnique({
-            where: { id: clientId },
+            where: { id: clientId ? clientId : '' },
         });
         if (!client) throw new AppError('Client not found', 404);
 
