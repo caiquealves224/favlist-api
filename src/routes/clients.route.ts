@@ -20,7 +20,12 @@ import { authorize } from '../middlewares/auth/authorize';
 
 const router = Router();
 
-router.post('*', authorize(['admin']));
+router.use((req, res, next) => {
+    if (req.method === 'POST') {
+        return authorize(['admin'])(req, res, next);
+    }
+    next();
+});
 
 router.get('/', (req: Request, res: Response) => {
     return new ListClientsController(new ListClientService()).handler(req, res);
