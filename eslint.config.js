@@ -41,6 +41,13 @@ export default typescriptEslint.config(
         },
     },
     {
-        ignores: ['dist/', 'node_modules/', '*.config.js', '*.config.ts'],
+        ignores: [
+            'dist/',
+            'node_modules/',
+            '*.config.js',
+            '*.config.ts',
+            'generated/',
+            'teste/',
+        ],
     }
 );

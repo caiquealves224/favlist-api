@@ -1,8 +1,12 @@
 import { prisma } from '../../database/prisma';
-import { Client } from '../../../generated/prisma';
+import { Client, Favorite } from '../../../generated/prisma';
+
+interface ClientWithFavorites extends Client {
+    favorites: Favorite[];
+}
 
 interface ListClientResponse {
-    clients: Client[];
+    clients: ClientWithFavorites[];
     total: number;
 }
 

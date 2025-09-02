@@ -15,12 +15,12 @@ export default class AddFavoritesService {
         });
         if (!client) throw new AppError('Client not found', 404);
 
-        const favoriteApiItem = await this.fetchProduct(itemId);
-
         const exists = await prisma.favorite.findUnique({
             where: { clientId_itemId: { clientId, itemId } },
         });
         if (exists) throw new AppError('Product already in favorites', 409);
+
+        const favoriteApiItem = await this.fetchProduct(itemId);
 
         const favorite = await prisma.favorite.create({
             data: {
@@ -74,6 +74,10 @@ export default class AddFavoritesService {
             return favoriteData;
         } catch (error) {
             console.error(error);
+            // Se o erro já é um AppError, relança sem modificar
+            if (error instanceof AppError) {
+                throw error;
+            }
             throw new AppError('Erro ao buscar o produto', 500);
         }
     }

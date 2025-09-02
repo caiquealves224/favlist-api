@@ -2,8 +2,13 @@ import { Client } from '../../../generated/prisma';
 import { prisma } from '../../database/prisma';
 import { AppError } from '../../errors/appError';
 
+interface UpdateClientData {
+    name?: string;
+    email?: string;
+}
+
 export class UpdateClientService {
-    async execute(id: string, data: any): Promise<Client> {
+    async execute(id: string, data: UpdateClientData): Promise<Client> {
         const clientAlreadyExists = await prisma.client.findUnique({
             where: {
                 id,
