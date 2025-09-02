@@ -16,8 +16,11 @@ import {
 import { GetClientService } from '../services/clients/get.service';
 import { ListClientService } from '../services/clients/list.service';
 import favoritesRoutes from './clients.favorites.route';
+import { authorize } from '../middlewares/auth/authorize';
 
 const router = Router();
+
+router.post('*', authorize(['admin']));
 
 router.get('/', (req: Request, res: Response) => {
     return new ListClientsController(new ListClientService()).handler(req, res);
