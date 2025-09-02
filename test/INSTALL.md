@@ -19,7 +19,7 @@ npm install --save-dev @types/jest ts-jest
 ls -la jest.config.js
 
 # Verificar se pasta de testes existe
-ls -la teste/
+ls -la test/
 ```
 
 ### 3. Executar testes
@@ -72,7 +72,7 @@ export default {
     ],
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'html'],
-    setupFilesAfterEnv: ['<rootDir>/teste/setup.ts'],
+    setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
     testTimeout: 10000,
 };
 ```
@@ -80,7 +80,7 @@ export default {
 ## 🧪 Estrutura de Testes Criada
 
 ```
-teste/
+test/
 ├── setup.ts                           # Configuração global
 ├── __mocks__/
 │   └── prisma.ts                      # Mock do Prisma

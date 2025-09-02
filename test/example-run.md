@@ -19,14 +19,14 @@ npm test
 
 **Saída esperada:**
 ```
- PASS  teste/services/clients/create.service.test.ts
- PASS  teste/services/clients/update.service.test.ts
- PASS  teste/services/clients/delete.service.test.ts
- PASS  teste/services/clients/get.service.test.ts
- PASS  teste/services/clients/list.service.test.ts
- PASS  teste/services/favorites/add.service.test.ts
- PASS  teste/services/favorites/delete.service.test.ts
- PASS  teste/services/favorites/get.service.test.ts
+ PASS  test/services/clients/create.service.test.ts
+ PASS  test/services/clients/update.service.test.ts
+ PASS  test/services/clients/delete.service.test.ts
+ PASS  test/services/clients/get.service.test.ts
+ PASS  test/services/clients/list.service.test.ts
+ PASS  test/services/favorites/add.service.test.ts
+ PASS  test/services/favorites/delete.service.test.ts
+ PASS  test/services/favorites/get.service.test.ts
 
 Test Suites: 8 passed, 8 total
 Tests:       32 passed, 32 total
@@ -41,14 +41,14 @@ npm run test:coverage
 
 **Saída esperada:**
 ```
- PASS  teste/services/clients/create.service.test.ts
- PASS  teste/services/clients/update.service.test.ts
- PASS  teste/services/clients/delete.service.test.ts
- PASS  teste/services/clients/get.service.test.ts
- PASS  teste/services/clients/list.service.test.ts
- PASS  teste/services/favorites/add.service.test.ts
- PASS  teste/services/favorites/delete.service.test.ts
- PASS  teste/services/favorites/get.service.test.ts
+ PASS  test/services/clients/create.service.test.ts
+ PASS  test/services/clients/update.service.test.ts
+ PASS  test/services/clients/delete.service.test.ts
+ PASS  test/services/clients/get.service.test.ts
+ PASS  test/services/clients/list.service.test.ts
+ PASS  test/services/favorites/add.service.test.ts
+ PASS  test/services/favorites/delete.service.test.ts
+ PASS  test/services/favorites/get.service.test.ts
 
 Test Suites: 8 passed, 8 total
 Tests:       32 passed, 32 total

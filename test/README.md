@@ -5,7 +5,7 @@ Este diretório contém todos os testes unitários da aplicação FavList API.
 ## 📁 Estrutura dos Testes
 
 ```
-teste/
+test/
 ├── setup.ts                    # Configuração global dos testes
 ├── __mocks__/                  # Mocks globais
 │   └── prisma.ts              # Mock do Prisma

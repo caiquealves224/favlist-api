@@ -47,7 +47,7 @@ export default typescriptEslint.config(
             '*.config.js',
             '*.config.ts',
             'generated/',
-            'teste/',
+            'test/',
         ],
     }
 );

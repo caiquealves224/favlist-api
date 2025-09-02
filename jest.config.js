@@ -2,7 +2,7 @@ export default {
     preset: 'ts-jest/presets/default-esm',
     extensionsToTreatAsEsm: ['.ts'],
     testEnvironment: 'node',
-    roots: ['<rootDir>/teste'],
+    roots: ['<rootDir>/test'],
     testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
     transform: {
         '^.+\\.ts$': ['ts-jest', {
@@ -19,6 +19,6 @@ export default {
     ],
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'html'],
-    setupFilesAfterEnv: ['<rootDir>/teste/setup.ts'],
+    setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
     testTimeout: 10000,
 };
