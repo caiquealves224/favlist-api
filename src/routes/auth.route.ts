@@ -3,7 +3,7 @@ import { LoginController } from '../controllers/auth/login.controller';
 
 const router = Router();
 
-router.post('/login', (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
     return new LoginController().handler(req, res);
 });
 
