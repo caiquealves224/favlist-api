@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { productCache } from '../../services/cache/product-cache.service';
+import { redisProductCache as productCache } from '../../services/cache/redis-cache.service';
 
 export default class CacheStatsController {
     async handler(request: Request, response: Response): Promise<Response> {
-        const stats = productCache.getStats();
+        const stats = await productCache.getStats();
         
         return response.status(200).json({
             success: true,
@@ -20,7 +20,7 @@ export default class CacheStatsController {
     }
 
     async clearCache(request: Request, response: Response): Promise<Response> {
-        productCache.clear();
+        await productCache.clear();
         
         return response.status(200).json({
             success: true,

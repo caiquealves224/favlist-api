@@ -1,7 +1,7 @@
 import { Favorite } from '../../../generated/prisma';
 import { prisma } from '../../database/prisma';
 import { AppError } from '../../errors/appError';
-import { productCache } from '../cache/product-cache.service';
+import { redisProductCache as productCache } from '../cache/redis-cache.service';
 
 interface ProductApiResponse {
     price: number;
@@ -47,7 +47,7 @@ export default class AddFavoritesService {
 
     private async fetchProduct(itemId: string): Promise<ProductApiResponse> {
         // Verificar se já está no cache
-        const cachedProduct = productCache.get(itemId);
+        const cachedProduct = await productCache.get(itemId);
         if (cachedProduct) {
             return cachedProduct;
         }
@@ -90,7 +90,7 @@ export default class AddFavoritesService {
         }
 
         // Salvar no cache
-        productCache.set(itemId, productData);
+        await productCache.set(itemId, productData);
 
         return productData;
     }
