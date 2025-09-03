@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { errorHandler } from '../../src/middlewares/error-handler';
 import { AppError } from '../../src/errors/appError';
 
 describe('Error Handler Middleware', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
+    let mockNext: jest.Mock;
     let mockJson: jest.Mock;
     let mockStatus: jest.Mock;
 
@@ -19,6 +20,7 @@ describe('Error Handler Middleware', () => {
             status: mockStatus as any,
             json: mockJson as any,
         };
+        mockNext = jest.fn();
 
         // Mock console.error para evitar logs nos testes
         jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -36,7 +38,8 @@ describe('Error Handler Middleware', () => {
         errorHandler(
             appError,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            mockNext as NextFunction
         );
 
         // Assert
@@ -55,7 +58,8 @@ describe('Error Handler Middleware', () => {
         errorHandler(
             genericError,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            mockNext as NextFunction
         );
 
         // Assert
@@ -75,7 +79,8 @@ describe('Error Handler Middleware', () => {
         errorHandler(
             errorWithoutMessage,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            mockNext as NextFunction
         );
 
         // Assert
@@ -94,7 +99,8 @@ describe('Error Handler Middleware', () => {
         errorHandler(
             forbiddenError,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            mockNext as NextFunction
         );
 
         // Assert
@@ -113,7 +119,8 @@ describe('Error Handler Middleware', () => {
         errorHandler(
             nonErrorObject,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            mockNext as NextFunction
         );
 
         // Assert

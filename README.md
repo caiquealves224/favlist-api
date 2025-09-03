@@ -10,6 +10,9 @@ Uma API REST moderna e robusta para gerenciamento de listas de favoritos, constr
 - **📚 Estrutura modular** - Fácil manutenção e escalabilidade
 - **🚦 Validações** - Validação de dados e tratamento de erros
 - **📖 Documentação clara** - Código bem documentado e legível
+- **⚡ Sistema de Cache** - Cache em memória para otimização de performance das consultas à API externa
+
+> 📋 **Cache Implementation**: Sistema de cache robusto para produtos externos com TTL configurável, estatísticas de uso e endpoints administrativos. [Ver documentação completa](CACHE_IMPLEMENTATION.md)
 
 ## 🛠️ Tecnologias
 
@@ -47,7 +50,10 @@ src/
 │   └── index.ts
 ├── services/            # Lógica de negócio
 │   ├── clients/         # Services de clientes
-│   └── favorites/       # Services de favoritos
+│   ├── favorites/       # Services de favoritos
+│   └── cache/           # Services de cache
+│       ├── product-cache.service.ts   # Cache em memória
+│       └── redis-cache.service.ts     # Implementação Redis (opcional)
 ├── middlewares/         # Middlewares customizados
 │   ├── auth/            # Middlewares de autenticação
 │   │   ├── authenticate.ts
@@ -97,6 +103,10 @@ JWT_SECRET=sua_chave_secreta_super_segura_aqui
 
 # Configurações do banco de dados
 DATABASE_URL="postgresql://usuario:senha@localhost:5432/favlist_db"
+
+# Cache e desenvolvimento (opcionais)
+NODE_ENV=development          # Ativa dados mockados em desenvolvimento
+MOCK_API=true                # Força uso de dados mockados independente do NODE_ENV
 ```
 
 4. **Execute o projeto**
@@ -178,6 +188,13 @@ A API utiliza **JWT (JSON Web Tokens)** para autenticação e autorização base
 | `GET`    | `/api/favorites` | Lista todos os favoritos  | ✅ Obrigatória |
 | `POST`   | `/api/favorites` | Adiciona um novo favorito | ✅ Obrigatória |
 | `DELETE` | `/api/favorites` | Remove favorito           | ✅ Obrigatória |
+
+### Cache (Admin)
+
+| Método   | Endpoint            | Descrição                   | Autenticação | Autorização |
+| -------- | ------------------- | --------------------------- | ------------ | ----------- |
+| `GET`    | `/api/cache/stats`  | Estatísticas do cache       | ✅ Obrigatória | 👑 Admin |
+| `DELETE` | `/api/cache/clear`  | Limpa todo o cache          | ✅ Obrigatória | 👑 Admin |
 
 ## 🔧 Configuração
 
@@ -287,6 +304,28 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```json
 {
   "message": "Forbidden: insufficient permissions"
+}
+```
+
+### 5. Verificar Estatísticas do Cache (Admin)
+
+```bash
+GET /api/cache/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "message": "Cache statistics retrieved successfully",
+  "data": {
+    "total": 15,
+    "active": 12,
+    "expired": 3,
+    "hitRate": "80.00%",
+    "timestamp": "2025-09-03T00:41:42.104Z"
+  }
 }
 ```
 
