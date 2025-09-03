@@ -94,46 +94,6 @@ REDIS_PORT=6379
 REDIS_PASSWORD=sua_senha
 ```
 
-## Testes
-
-### Teste Manual
-
-Execute o script de teste:
-```bash
-node test-api.js
-```
-
-### Teste do Cache
-
-Execute o script específico do cache:
-```bash
-node test-cache.js
-```
-
-### Cenários Testados
-
-1. ✅ Cache MISS - Primeiro acesso ao produto
-2. ✅ Cache HIT - Segundo acesso ao mesmo produto
-3. ✅ Estatísticas do cache
-4. ✅ Limpeza do cache
-5. ✅ Dados mockados em desenvolvimento
-
-## Performance
-
-### Benefícios do Cache
-
-- **Redução de latência**: Produtos em cache são retornados instantaneamente
-- **Economia de recursos**: Menos chamadas à API externa
-- **Melhoria da experiência**: Resposta mais rápida para o usuário
-- **Controle de custos**: Redução no uso de APIs pagas
-
-### Métricas Monitoradas
-
-- **Hit Rate**: Taxa de acertos do cache
-- **Itens ativos**: Produtos atualmente em cache
-- **Itens expirados**: Produtos que expiraram e foram removidos
-- **Total de operações**: Histórico de uso do cache
-
 ## Próximos Passos
 
 1. **Monitoramento**: Implementar logs estruturados para análise
